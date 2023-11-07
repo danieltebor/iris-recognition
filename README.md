@@ -19,15 +19,15 @@ The framework uses multiple external and Python dependencies. The dependency ins
 The following results were obtained using the ResNet50 CNN and a dataset created to test the effects of blinking on iris recognition. The specific sample results shown are graphs for model weights obtained by training using a dataset with an original iris occlusion distribution (with most eyes being more than 80% open) plus a dataset of synthetically occluded iris images, with cohorts ranging from 0% occlusion to 60% occlusion. The validation dataset was split into 10 cohorts, each with a different level of occlusion (ranging from 0 to 90%). A sample of the dataset can be seen [here](/docs/sample-dataset/). The following graphs show the results of such an experiment:
 
 <p float="left">
-    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/accuracy_bargraph.png" width="500"/>
-    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/accuracy_roc.png" width="500"/>
+    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/accuracy_bargraph.png" width="400"/>
+    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/accuracy_roc.png" width="400"/>
 </p>
 
 <div style="display: flex; flex-wrap: wrap;">
-    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/0_percent_occlusion_dataset_euclideandist_histogram.png" width="500"/>
-    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/30_percent_occlusion_dataset_euclideandist_histogram.png" width="500"/>
-    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/60_percent_occlusion_dataset_euclideandist_histogram.png" width="500"/>
-    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/90_percent_occlusion_dataset_euclideandist_histogram.png" width="500"/>
+    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/0_percent_occlusion_dataset_euclideandist_histogram.png" width="400"/>
+    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/30_percent_occlusion_dataset_euclideandist_histogram.png" width="400"/>
+    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/60_percent_occlusion_dataset_euclideandist_histogram.png" width="400"/>
+    <img src="/assets/fig/resnet50_original_plus_0_to_60_percent_synthetic_occlusion/90_percent_occlusion_dataset_euclideandist_histogram.png" width="400"/>
 </div>
 
 A presentation of the results for the whole experiment can be found [here](/assets/effect-of-blink-on-iris-presentation.pptx) or [downloaded](https://github.com/danieltebor/cnn-iris-recognition-framework/raw/main/docs/effect-of-blink-on-iris-presentation.pptx)).
