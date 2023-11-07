@@ -1,0 +1,17 @@
+# Generated files
+# ---------------
+out/*
+
+# Python Files
+# ------------
+*.pyc
+*.pyo
+*.pyd
+__pycache__
+
+# IDE Files
+# ---------
+.code-workspace
+.idea
+.vscode
+.vs
