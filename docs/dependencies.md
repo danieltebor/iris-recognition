@@ -41,7 +41,7 @@ The following dependencies are required to run the framework:
     ```
 3. **Python 3.8+**: Python 3.8 can be installed using:
     ```bash
-    sudo yum install python38
+    sudo yum install python3
     ```
 4. **Python pip**: Pip can be installed using:
     ```bash
