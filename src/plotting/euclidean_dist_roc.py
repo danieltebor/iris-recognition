@@ -64,15 +64,16 @@ def plot_euclidean_dist_roc(euclidean_dist_files: list[str],
         plt.plot(fpr_rates[i], tpr_rates[i], label=labels[i])
 
     plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
-    plt.title(title)
+    #plt.title(title)
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.0])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
+    plt.xlabel('False Positive Rate', fontsize=14)
+    plt.ylabel('True Positive Rate', fontsize=14)
     plt.legend(loc="lower right")
 
     output_writer = OutputWriter()
     log.info(f'Saving accuracy roc graph to {output_writer.fig_dir}/{model_filebasename}/{filename}')
     output_writer.write_fig(model_filebasename, filename, plt.gcf())
 
+    plt.tight_layout()
     plt.clf()

@@ -8,7 +8,10 @@ Description: This module contains a class for loading the iris dataset.
 import itertools
 import logging
 import os
+import random
+from typing import Tuple
 
+import numpy as np
 from PIL import Image
 from sklearn.preprocessing import LabelEncoder
 import torch
@@ -17,54 +20,48 @@ from torchvision.transforms import transforms
 from torchvision.transforms.functional import InterpolationMode
 
 from iris_dataset_processing.iris_dataset_flags import *
+from iris_dataset_processing.circle_crop import CircleCrop
 
 
 class IrisDataset(Dataset):
-    """
-    A PyTorch dataset for loading iris images and their corresponding labels.
-
-    Args:
-        data_path (str): The path to the root directory of the iris dataset.
-        cohorts (list[IrisDatasetCohort]): A list of IrisDatasetCohort enums representing the cohorts to include in the dataset.
-        img_flags (list[IrisImgFlag]): A list of IrisImgFlag enums representing the images to include in the dataset.
-        img_input_shape ((int, int, int)): A tuple representing the desired input shape of the images in the dataset.
-        should_use_augmentation (bool, optional): Whether to use data augmentation. Defaults to False.
-    """
-
     def __init__(self,
                  data_path: str,
                  cohorts: list[IrisDatasetCohort],
                  img_exclusion_flags: list[IrisImgFlag],
-                 img_input_shape: (int, int, int),
+                 img_input_shape: Tuple[int, int, int],
                  label_encoder: LabelEncoder = None,
                  should_use_augmentation: bool = False):
         self._data_path = data_path
 
         # Build list of image paths.
-        self._img_paths = []
-        self._img_filenames = []
+        img_paths = []
+        img_filenames = []
         for cohort in cohorts:
             cohort_path = os.path.join(data_path, cohort.value)
             with os.scandir(cohort_path) as entries:
                 for entry in entries:
                     if entry.is_file() and not self._img_file_contains_flag(entry.name, img_exclusion_flags):
-                        self._img_paths.append(entry.path)
-                        self._img_filenames.append(entry.name)
+                        img_paths.append(entry.path)
+                        img_filenames.append(entry.name)
+
+        self._img_paths = np.array(img_paths)
+        self._img_filenames = np.array(img_filenames)
 
         # Build list of image labels.
-        self._labels = []
-        for img_path in self._img_paths:
-            img_filename = os.path.basename(img_path)
+        labels = []
+        for img_filename in self._img_filenames:
             label = img_filename.split('_')[IrisImgFlag.SUBJECT_FILENAME_COMPONENT_IDX.value][1:]
-            self._labels.append(int(label))
+            labels.append(int(label))
 
         # Encode the labels to consecutive integers.
         self._label_encoder = label_encoder
-        if label_encoder is None:
+        if self._label_encoder is None:
             self._label_encoder = LabelEncoder()
-            self._labels = self._label_encoder.fit_transform(self._labels)
+            self._labels = self._label_encoder.fit_transform(labels)
         else:
-            self._labels = self._label_encoder.transform(self._labels)
+            self._labels = self._label_encoder.transform(labels)
+
+        self._labels = np.array(self._labels)
 
         # Build image transform.
         transform_composition = [
@@ -82,27 +79,19 @@ class IrisDataset(Dataset):
                                                        translate=(0.1, 0.1),
                                                        interpolation=InterpolationMode.BICUBIC)
             transform_composition.insert(0, affine_transform)
+            #transform_composition.insert(0, CircleCrop(radius_percent_range=(0.25, 0.5), mode='inner'))
+            #transform_composition.insert(0, CircleCrop(radius_percent_range=(0.8, 1.0), mode='outer'))
+            transform_composition.insert(0, transforms.RandomResizedCrop(size=img_input_shape[1:3], scale=(0.95, 1.0), ratio=(1, 1)))
 
         self._transform = transforms.Compose(transform_composition)
 
         log = logging.getLogger(__name__)
         log.info(f'Configured dataset of {len(self._img_paths)} images and {self.num_classes} classes from "{data_path}"')
 
-    
     def __len__(self) -> int:
         return len(self._img_paths)
     
-    def __getitem__(self, idx: int) -> (torch.Tensor, torch.Tensor, str):
-        """
-        Returns the image, label, and filename at the given index.
-
-        Args:
-            idx (int): The index of the item to retrieve.
-
-        Returns:
-            tuple: A tuple containing the image tensor, label tensor, and filename string.
-        """
-        
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor, str]:
         img_path = self._img_paths[idx]
         
         img = Image.open(img_path)
@@ -132,7 +121,6 @@ class IrisDataset(Dataset):
         flags = list(itertools.chain(*[flag.value if isinstance(flag.value, list) else [flag.value] for flag in flags]))
         
         filename_components = filename.split('.')[0].split('_')
-
         for flag in flags:
             component_idx = 0
             flag_found = False
@@ -152,29 +140,41 @@ class IrisDataset(Dataset):
                 return True
         
         return False
+    
+    def get_random_img_for_encoded_label(self, label: int) -> Tuple[torch.Tensor, str]:
+        label_indices = [i for i, l in enumerate(self.labels_encoded) if l == label]
+        random_index = random.choice(label_indices)
+        return self.__getitem__(random_index)[0], self.__getitem__(random_index)[2]
+    
+    def get_random_img_excluding_encoded_label(self, label: int) -> Tuple[torch.Tensor, torch.Tensor, str]:
+        label_indices = [i for i, l in enumerate(self.labels_encoded) if l != label]
+        random_index = random.choice(label_indices)
+        img, label, filename = self.__getitem__(random_index)
+        return img, label, filename
 
     @property
-    def img_paths(self) -> list[str]:
+    def img_paths(self) -> np.ndarray[str]:
         return self._img_paths
     
     @property
-    def img_filenames(self) -> list[str]:
+    def img_filenames(self) -> np.ndarray[str]:
         return self._img_filenames
     
     @property
-    def img_tensors(self) -> list[torch.Tensor]:
-        img_tensors = []
+    def img_tensors(self) -> np.ndarray[torch.Tensor]:
+        img_tensors = np.array([])
+        img_tensors.resize(len(self._img_filenames))
         for i in range(len(self._img_filenames)):
             img_tensor, _, _ = self.__getitem__(i)
             img_tensors.append(img_tensor)
         return img_tensors
 
     @property
-    def labels(self) -> list[int]:
+    def labels(self) -> np.ndarray[int]:
         return set(self.label_encoder.inverse_transform(self._labels))
     
     @property
-    def labels_encoded(self) -> list[int]:
+    def labels_encoded(self) -> np.ndarray[int]:
         return self._labels
     
     @property
@@ -184,3 +184,7 @@ class IrisDataset(Dataset):
     @property
     def num_classes(self) -> int:
         return len(set(self.labels_encoded))
+    
+    @property
+    def transform(self) -> transforms.Compose:
+        return self._transform

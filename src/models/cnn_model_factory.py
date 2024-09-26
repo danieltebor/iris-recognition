@@ -7,7 +7,7 @@ Description: This module contains a factory class for creating or loading CNN mo
 
 import logging
 from enum import Enum
-from typing import Union
+from typing import  Tuple, Union
 
 from torch import nn, optim
 from torchvision.models import alexnet, AlexNet_Weights
@@ -25,36 +25,7 @@ class ModelName(Enum):
     RESNET152 = 'resnet152'
 
 class CNNModelFactory:
-    """
-    A factory class for creating CNN models using PyTorch.
-
-    Attributes:
-        None
-
-    Methods:
-        _create_alexnet(num_classes: int = None) -> (nn.Module, nn.Module, optim.Optimizer):
-            Creates an AlexNet model with the specified number of output classes.
-
-        _create_resnet50(num_classes: int = None) -> (nn.Module, nn.Module, optim.Optimizer):
-            Creates a ResNet50 model with the specified number of output classes.
-
-        _create_resnet101(num_classes: int = None) -> (nn.Module, nn.Module, optim.Optimizer):
-            Creates a ResNet101 model with the specified number of output classes.
-
-        _create_resnet152(num_classes: int = None) -> (nn.Module, nn.Module, optim.Optimizer):
-            Creates a ResNet152 model with the specified number of output classes.
-
-        create_model(model_name: Union[str, ModelName], num_classes: int) -> (nn.Module, nn.Module, optim.Optimizer):
-            Creates a CNN model based on the specified model name and number of classes.
-
-        load_model(model_name: Union[str, ModelName], model_file: str) -> (nn.Module, nn.Module, optim.Optimizer):
-            Loads a saved model from a file and returns the model, criterion, and optimizer.
-
-        get_model_input_shape(model_name: Union[str, ModelName]) -> (int, int, int):
-            Gets the input shape for the specified model.
-    """
-
-    def _create_alexnet(self, num_classes: int = None) -> (nn.Module, nn.Module, optim.Optimizer):
+    def _create_alexnet(self, num_classes: int = None) -> Tuple[nn.Module, nn.Module, optim.Optimizer]:
         if num_classes == None:
             raise RuntimeError("Num classes unspecified")
         
@@ -71,7 +42,7 @@ class CNNModelFactory:
         
         return model, criterion, optimizer
     
-    def _create_resnet50(self, num_classes: int = None) -> (nn.Module, nn.Module, optim.Optimizer):
+    def _create_resnet50(self, num_classes: int = None) -> Tuple[nn.Module, nn.Module, optim.Optimizer]:
         if num_classes == None:
             raise RuntimeError("Num classes unspecified")
         
@@ -89,7 +60,7 @@ class CNNModelFactory:
         
         return model, criterion, optimizer
     
-    def _create_resnet101(self, num_classes: int = None) -> (nn.Module, nn.Module, optim.Optimizer):
+    def _create_resnet101(self, num_classes: int = None) -> Tuple[nn.Module, nn.Module, optim.Optimizer]:
         if num_classes == None:
             raise RuntimeError("Num classes unspecified")
         
@@ -107,7 +78,7 @@ class CNNModelFactory:
         
         return model, criterion, optimizer
     
-    def _create_resnet152(self, num_classes: int = None) -> (nn.Module, nn.Module, optim.Optimizer):
+    def _create_resnet152(self, num_classes: int = None) -> Tuple[nn.Module, nn.Module, optim.Optimizer]:
         if num_classes == None:
             raise RuntimeError("Num classes unspecified")
         
@@ -125,95 +96,70 @@ class CNNModelFactory:
         
         return model, criterion, optimizer
         
-    def create_model(self, model_name: Union[str, ModelName], num_classes: int) -> (nn.Module, nn.Module, optim.Optimizer):
-        """
-        Creates a PyTorch model based on the specified model name and number of classes.
-
-        Args:
-            model_name (Union[str, ModelName]): The name of the model to create.
-            num_classes (int): The number of output classes for the model.
-
-        Returns:
-            Tuple containing the PyTorch model, loss function, and optimizer.
-        """
-
+    def create_model(self, modelname: Union[str, ModelName], num_classes: int) -> Tuple[nn.Module, nn.Module, optim.Optimizer]:
         if num_classes == None:
             raise RuntimeError('Num classes unspecified')
 
         # Convert model_name to ModelName enum if it is a string.
-        if isinstance(model_name, str):
+        if isinstance(modelname, str):
             for name in ModelName:
-                if model_name.lower() == name.value.lower():
-                    model_name = name
+                if modelname.lower() == name.value.lower():
+                    modelname = name
                     break
             else:
-                raise RuntimeError(f'Unknown model: {model_name}')
+                raise RuntimeError(f'Unknown model: {modelname}')
             
         model = None
         criterion = None
         optimizer = None
-        if model_name == ModelName.ALEXNET:
+        if modelname == ModelName.ALEXNET:
             model, criterion, optimizer = self._create_alexnet(num_classes)
-        elif model_name == ModelName.RESNET50:
+        elif modelname == ModelName.RESNET50:
             model, criterion, optimizer = self._create_resnet50(num_classes)
-        elif model_name == ModelName.RESNET101:
+        elif modelname == ModelName.RESNET101:
             model, criterion, optimizer = self._create_resnet101(num_classes)
-        elif model_name == ModelName.RESNET152:
+        elif modelname == ModelName.RESNET152:
             model, criterion, optimizer = self._create_resnet152(num_classes)
         
         log = logging.getLogger(__name__)
-        log.info(f'Created {model_name.value} model with {num_classes} output classes')
+        log.info(f'Created {modelname.value} model with {num_classes} output classes')
         return model, criterion, optimizer
         
-    def load_model(self, model_filename: str) -> (nn.Module, nn.Module, optim.Optimizer):
-        """
-        Loads a saved model from a pt file and returns the model, criterion, and optimizer.
-
-        Args:
-            model_name (Union[str, ModelName]): The name of the model to create.
-            model_path (str): The path to the saved model file.
-
-        Returns:
-            Tuple containing the loaded model, criterion, and optimizer.
-        """
-
-        model_name = model_filename.split('_')[0]
+    def load_model(self, model_filename: str, is_classifier: bool = True) -> Tuple[nn.Module, nn.Module, optim.Optimizer]:
+        modelname = model_filename.split('_')[0]
 
         output_reader = OutputReader()
         state_dict = output_reader.read_model(model_filename)
 
         # Get number of classes from saved model.
-        num_classes = state_dict['fc.weight'].shape[0]
+        if is_classifier:
+            num_classes = state_dict['fc.weight'].shape[0]
+        else:
+            num_classes = 1
 
-        model, criterion, optimizer = self.create_model(model_name=model_name, num_classes=num_classes)
+        model, criterion, optimizer = self.create_model(modelname=modelname, num_classes=num_classes)
+
+        if not is_classifier:
+            model = nn.Sequential(*list(model.children())[:-1])
+
         model.load_state_dict(state_dict=state_dict)
 
         return model, criterion, optimizer
 
-    def get_model_input_shape(self, model_name: Union[str, ModelName]) -> (int, int, int):
-        """
-        Returns the input shape of the specified model.
-
-        Args:
-            model_name (Union[str, ModelName]): The name of the model.
-
-        Returns:
-            Tuple[int, int, int]: The input shape of the model.
-        """
-
-        if isinstance(model_name, str):
+    def get_model_input_shape(self, modelname: Union[str, ModelName]) -> Tuple[int, int, int]:
+        if isinstance(modelname, str):
             try:
-                model_name = ModelName[model_name.upper()]
+                modelname = ModelName[modelname.upper()]
             except KeyError:
-                raise RuntimeError(f'Unknown model name: {model_name}')
+                raise RuntimeError(f'Unknown model name: {modelname}')
 
-        if model_name == ModelName.ALEXNET:
+        if modelname == ModelName.ALEXNET:
             return 3, 256, 256
-        elif model_name == ModelName.RESNET50:
+        elif modelname == ModelName.RESNET50:
             return 3, 224, 224
-        elif model_name == ModelName.RESNET101:
+        elif modelname == ModelName.RESNET101:
             return 3, 224, 224
-        elif model_name == ModelName.RESNET152:
+        elif modelname == ModelName.RESNET152:
             return 3, 224, 224
         else:
-            raise RuntimeError(f'Unknown model name: {model_name}')
+            raise RuntimeError(f'Unknown model name: {modelname}')

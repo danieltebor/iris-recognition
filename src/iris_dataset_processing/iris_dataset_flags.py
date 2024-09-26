@@ -9,17 +9,30 @@ from enum import Enum
 
 
 class IrisDatasetCohort(Enum):
-    """
-    Enum of the different cohorts of iris images in the dataset.
-    """
-
     NORMALIZED = 'Normalized'
     OCULAR = 'Ocular'
-    OCULAR_IRIS = 'OcularIris'
-    OCULAR_NO_IRIS = 'OcularNoIris'
+    OCULARIRIS = 'OcularIris'
+    OCULARNOIRIS = 'OcularNoIris'
     PERIOCULAR = 'Periocular'
-    PERIOCULAR_IRIS = 'PeriocularIris'
-    PERIOCULAR_NO_IRIS = 'PeriocularNoIris'
+    PERIOCULARIRIS = 'PeriocularIris'
+    PERIOCULARNOIRIS = 'PeriocularNoIris'
+
+    OCULARIRIS_FC_LEFT = 'oculariris/fc-left'
+    OCULARIRIS_OC_LEFT = 'oculariris/oc-left'
+    OCULARIRIS_FC_RIGHT = 'oculariris/fc-right'
+    OCULARIRIS_OC_RIGHT = 'oculariris/oc-right'
+    OCULARIRIS_TRIPLET_LOSS_ANCHOR_FC_LEFT = 'oculariris/triplet-loss/anchor-fc-left'
+    OCULARIRIS_TRIPLET_LOSS_COMPLETE_ANCHOR_OC_LEFT = 'oculariris/triplet-loss/complete-anchor-oc-left'
+    OCULARIRIS_TRIPLET_LOSS_TRAINING_ANCHOR_OC_LEFT = 'oculariris/triplet-loss/training-anchor-oc-left'
+    OCULARIRIS_TRIPLET_LOSS_TESTING_ANCHOR_OC_LEFT = 'oculariris/triplet-loss/testing-anchor-oc-left'
+    OCULARIRIS_TRIPLET_LOSS_ANCHOR_FC_RIGHT = 'oculariris/triplet-loss/anchor-fc-right'
+    OCULARIRIS_TRIPLET_LOSS_COMPLETE_ANCHOR_OC_RIGHT = 'oculariris/triplet-loss/complete-anchor-oc-right'
+    OCULARIRIS_TRIPLET_LOSS_TRAINING_ANCHOR_OC_RIGHT = 'oculariris/triplet-loss/training-anchor-oc-right'
+    OCULARIRIS_TRIPLET_LOSS_TESTING_ANCHOR_OC_RIGHT = 'oculariris/triplet-loss/testing-anchor-oc-right'
+    OCULARIRIS_TRIPLET_LOSS_TESTING_OC_LEFT = 'oculariris/triplet-loss/testing-oc-left'
+    OCULARIRIS_TRIPLET_LOSS_TESTING_OC_RIGHT = 'oculariris/triplet-loss/testing-oc-right'
+    OCULARIRIS_TRIPLET_LOSS_TRAINING_OC_LEFT = 'oculariris/triplet-loss/training-oc-left'
+    OCULARIRIS_TRIPLET_LOSS_TRAINING_OC_RIGHT = 'oculariris/triplet-loss/training-oc-right'
     
     ORIGINAL_OCCLUSION_DISTRIBUTION = 'original_occlusion_distribution'
     PERCENT_OCCLUSION_00 = '0_percent_occlusion'
@@ -36,10 +49,6 @@ class IrisDatasetCohort(Enum):
 from enum import Enum
 
 class IrisImgFlag(Enum):
-    """
-    Enum for iris image flags. The values are components of file names in the iris dataset.
-    """
-
     SUBJECT = 's'
     L_EYE = 'L'
     R_EYE = 'R'

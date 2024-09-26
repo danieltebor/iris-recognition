@@ -1,0 +1,9 @@
+# -*- coding: utf-8 -*-
+from iris_dataset_processing.iris_dataset_flags import *
+
+
+COMPLETE_ANCHOR_DATASET_PATH = './data/'
+
+COMPLETE_ANCHOR_COHORTS = [IrisDatasetCohort.OCULARIRIS_TRIPLET_LOSS_COMPLETE_ANCHOR_OC_RIGHT]
+COMPLETE_ANCHOR_IMG_EXCLUSION_FLAGS = []
+COMPLETE_ANCHOR_BATCH_SIZE = 24

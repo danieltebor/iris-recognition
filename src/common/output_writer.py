@@ -227,8 +227,6 @@ class OutputWriter:
         
         file_object = io.BytesIO()
         torch.save(model.state_dict(), file_object)
-        # Print type of file_object.
-        print(type(file_object))
         file_object.seek(0)
         self._write_file(filename, file_object.read(), 'model')
 
