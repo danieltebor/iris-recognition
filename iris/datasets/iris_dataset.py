@@ -34,6 +34,30 @@ IRIS_IMAGE_ANGLES = [
     N40_ANGLE,
     N50_ANGLE
 ]
+P50_ANGLE_TRANSFORM = (0.62, 0, 57, 0, 1, 0)
+P40_ANGLE_TRANSFORM = (0.74, 0, 39, 0, 1, 0)
+P30_ANGLE_TRANSFORM = (0.835, 0, 25, 0, 1, 0)
+P20_ANGLE_TRANSFORM = (0.925, 0, 11.5, 0, 1, 0)
+P10_ANGLE_TRANSFORM = (0.99, 0, 2, 0, 1, 0)
+FRONTAL_ANGLE_TRANSFORM = (1, 0, 0, 0, 1, 0)
+N10_ANGLE_TRANSFORM = (0.99, 0, 2, 0, 1, 0)
+N20_ANGLE_TRANSFORM = (0.97, 0, 5, 0, 1, 0)
+N30_ANGLE_TRANSFORM = (0.91, 0, 14, 0, 1, 0)
+N40_ANGLE_TRANSFORM = (0.83, 0, 26, 0, 1, 0)
+N50_ANGLE_TRANSFORM = (0.72, 0, 42, 0, 1, 0)
+IRIS_ANGLE_TRANSFORMS = {
+    P50_ANGLE: P50_ANGLE_TRANSFORM,
+    P40_ANGLE: P40_ANGLE_TRANSFORM,
+    P30_ANGLE: P30_ANGLE_TRANSFORM,
+    P20_ANGLE: P20_ANGLE_TRANSFORM,
+    P10_ANGLE: P10_ANGLE_TRANSFORM,
+    FRONTAL_ANGLE: FRONTAL_ANGLE_TRANSFORM,
+    N10_ANGLE: N10_ANGLE_TRANSFORM,
+    N20_ANGLE: N20_ANGLE_TRANSFORM,
+    N30_ANGLE: N30_ANGLE_TRANSFORM,
+    N40_ANGLE: N40_ANGLE_TRANSFORM,
+    N50_ANGLE: N50_ANGLE_TRANSFORM
+}
 IMAGE_MODE_RGB = 'RGB'
 IMAGE_MODE_GRAY = 'L'
 IMAGE_MODES = [
@@ -42,12 +66,15 @@ IMAGE_MODES = [
 ]
 
 class IrisDataset(Dataset):
-    def __init__(self,
-                 data_dir: str,
-                 transform: transforms.Compose,
-                 angles: list[str] = None,
-                 label_encoder: LabelEncoder = None,
-                 image_mode: str = IMAGE_MODE_RGB):
+    def __init__(
+        self,
+        data_dir: str,
+        transform: transforms.Compose,
+        angles: list[str] = None,
+        label_encoder: LabelEncoder = None,
+        image_mode: str = IMAGE_MODE_RGB,
+        angle_correction: bool = False
+    ):
         assert os.path.exists(data_dir), f'Data directory does not exist: {data_dir}'
         if angles is not None:
             assert all(angle in IRIS_IMAGE_ANGLES for angle in angles), f'Invalid angle in angles: {angles}'
@@ -56,6 +83,7 @@ class IrisDataset(Dataset):
         self.data_dir = data_dir
         self.transform = transform
         self.image_mode = image_mode
+        self.angle_correction = angle_correction
         self.image_files = os.listdir(data_dir)
         
         image_filenames = []
@@ -81,6 +109,9 @@ class IrisDataset(Dataset):
     def __getitem__(self, idx) -> tuple[torch.Tensor, torch.Tensor]:
         image_path = os.path.join(self.data_dir, self.image_filenames[idx])
         sample = Image.open(image_path).convert(self.image_mode)
+        if self.angle_correction:
+            angle = self.image_filenames[idx].split('_')[IRIS_IMAGE_FILENAME_ANGLE_IDX]
+            sample = self._apply_angle_correction(sample, angle)
         sample = self.transform(sample)
         
         encoded_label = self.encoded_labels[idx]
@@ -95,6 +126,15 @@ class IrisDataset(Dataset):
         label = self.labels[idx]
         
         return sample, label
+    
+    def _apply_angle_correction(self, image: Image.Image, angle: str) -> Image.Image:
+        transform_matrix = IRIS_ANGLE_TRANSFORMS[angle]
+        return image.transform(
+            image.size,
+            Image.AFFINE,
+            transform_matrix,
+            Image.BICUBIC,
+        )
     
 def get_encoder_for_all_labels_in(data_dirs: list[str]) -> LabelEncoder:
     labels = []

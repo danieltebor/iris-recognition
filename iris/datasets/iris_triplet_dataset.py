@@ -7,14 +7,17 @@ from iris.datasets.iris_dataset import *
 
 
 class IrisTripletDataset(IrisDataset):
-    def __init__(self,
-                 data_dir: str,
-                 transform: transforms.Compose,
-                 angles: list[str] = None,
-                 image_mode: str = IMAGE_MODE_RGB,
-                 is_deterministic: bool = False,
-                 max_ancher_neg_angle_diff: int = None):
-        super().__init__(data_dir, transform, angles=angles, image_mode=image_mode)
+    def __init__(
+        self,
+        data_dir: str,
+        transform: transforms.Compose,
+        angles: list[str] = None,
+        image_mode: str = IMAGE_MODE_RGB,
+        angle_correction: bool = False,
+        is_deterministic: bool = False,
+        max_ancher_neg_angle_diff: int = None
+    ):
+        super().__init__(data_dir, transform, angles=angles, image_mode=image_mode, angle_correction=angle_correction)
         
         self.is_deterministic = is_deterministic
         self.max_ancher_neg_angle_diff = max_ancher_neg_angle_diff
@@ -80,9 +83,21 @@ class IrisTripletDataset(IrisDataset):
             negative_idx = self.rng.choice(negative_idx_candidates)
             negative_path = os.path.join(self.data_dir, self.image_filenames[negative_idx])
 
-        anchor_sample = self.transform(Image.open(anchor_path).convert(self.image_mode))
-        positive_sample = self.transform(Image.open(positive_path).convert(self.image_mode))
-        negative_sample = self.transform(Image.open(negative_path).convert(self.image_mode))
+        anchor_sample = Image.open(anchor_path).convert(self.image_mode)
+        positive_sample = Image.open(positive_path).convert(self.image_mode)
+        negative_sample = Image.open(negative_path).convert(self.image_mode)
+        
+        if self.angle_correction:
+            anchor_angle = anchor_filename.split('_')[IRIS_IMAGE_FILENAME_ANGLE_IDX]
+            anchor_sample = self._apply_angle_correction(anchor_sample, anchor_angle)
+            positive_angle = self.image_filenames[positive_idx].split('_')[IRIS_IMAGE_FILENAME_ANGLE_IDX]
+            positive_sample = self._apply_angle_correction(positive_sample, positive_angle)
+            negative_angle = self.image_filenames[negative_idx].split('_')[IRIS_IMAGE_FILENAME_ANGLE_IDX]
+            negative_sample = self._apply_angle_correction(negative_sample, negative_angle)
+
+        anchor_sample = self.transform(anchor_sample)
+        positive_sample = self.transform(positive_sample)
+        negative_sample = self.transform(negative_sample)
         
         return anchor_sample, positive_sample, negative_sample
     

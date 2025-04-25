@@ -51,6 +51,7 @@ def train_model(config: dict) -> str:
         transform=transform,
         config=config,
         is_triplet=True,
+        is_deterministic=True,
     )
     val_eer_loader = _get_dataloader(
         data_dir=config['data']['test_dir'],
@@ -352,6 +353,7 @@ def _get_dataloader(
     transform: transforms.Compose,
     config: dict,
     is_triplet: bool,
+    is_deterministic: bool = False,
     shuffle: bool = False,
     angles: list[str] = None
 ) -> DataLoader:
@@ -360,6 +362,8 @@ def _get_dataloader(
             data_dir=data_dir,
             transform=transform,
             angles=angles,
+            angle_correction=config['angle_correction'],
+            is_deterministic=is_deterministic,
             max_ancher_neg_angle_diff=config['max_anchor_negative_angle_diff'],
         )
     else:
@@ -367,6 +371,7 @@ def _get_dataloader(
             data_dir=data_dir,
             transform=transform,
             angles=angles,
+            angle_correction=config['angle_correction'],
         )
     
     num_workers = torch.get_num_threads()
