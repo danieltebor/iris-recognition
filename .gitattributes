@@ -1,4 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-archive/triplet-loss-open-world/convnext-tiny/pom-0/convnext_tiny.safetensors filter=lfs diff=lfs merge=lfs -text
-archive/triplet-loss-open-world/stn-convnext-tiny/pom-0/stn_convnext_tiny.safetensors filter=lfs diff=lfs merge=lfs -text
+archive/triplet-loss-open-world/models/convnext-tiny/pom-0/convnext_tiny.safetensors filter=lfs diff=lfs merge=lfs -text
+archive/triplet-loss-open-world/models/stn-convnext-tiny/pom-0/stn_convnext_tiny.safetensors filter=lfs diff=lfs merge=lfs -text
