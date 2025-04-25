@@ -52,9 +52,9 @@ def roc(results: dict,
         
         plt.plot(fpr, tpr, label=label, color=color)
         
-        if plot_eer:
-            eer = result['eer']
-            plt.scatter(eer, 1 - eer, color=color)
+        #if plot_eer:
+        #    eer = result['eer']
+        #    plt.scatter(eer, 1 - eer, color=color)
         
     plt.plot([0, 1], [0, 1], linestyle='--', color='black')
     if plot_eer:
