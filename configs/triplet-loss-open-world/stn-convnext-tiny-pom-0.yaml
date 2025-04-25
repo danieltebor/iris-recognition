@@ -1,7 +1,8 @@
 experiment_name: "pom-0"
 model_name: "stn_convnext_tiny"
-num_epochs: 20
-learning_rate: 0.00005
+num_epochs: 100
+early_stopping_tolerance: 20
+learning_rate: 5.0e-5
 weight_decay: 0.0
 margin: 0.75
 batch_size: 64

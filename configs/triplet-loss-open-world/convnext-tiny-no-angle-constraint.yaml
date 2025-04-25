@@ -1,7 +1,8 @@
 experiment_name: "no-angle-constraint"
 model_name: "convnext_tiny"
-num_epochs: 20
-learning_rate: 0.0001
+num_epochs: 100
+early_stopping_tolerance: 20
+learning_rate: 1.0e-4
 weight_decay: 0.0
 margin: 0.75
 batch_size: 64

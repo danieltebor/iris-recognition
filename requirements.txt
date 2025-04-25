@@ -1,9 +1,9 @@
-kornia
 matplotlib
 numpy
 pyyaml
 safetensors
 scikit-learn
 torch
+torch-optimizer
 torchvision
 tqdm
