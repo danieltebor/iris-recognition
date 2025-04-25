@@ -8,12 +8,14 @@ from matplotlib.colors import LinearSegmentedColormap
 matplotlib.use('Agg')
 
 
-def intra_inter_class_distance_histogram(intra_distances: np.ndarray,
-                                         inter_distances: np.ndarray,
-                                         save_dir: str,
-                                         filename: str = 'intra-inter-class-distance-hist',
-                                         title: str = None,
-                                         legend_title = None):
+def intra_inter_class_distance_histogram(
+    intra_distances: np.ndarray,
+    inter_distances: np.ndarray,
+    save_dir: str,
+    filename: str = 'intra-inter-class-distance-hist',
+    title: str = None,
+    legend_title = None
+):
     plt.figure()
     plt.hist(intra_distances, bins=100, alpha=0.5, color='blue', label='Intra-class Distances', density=True)
     plt.hist(inter_distances, bins=100, alpha=0.5, color='red', label='Inter-class Distances', density=True)
@@ -26,15 +28,17 @@ def intra_inter_class_distance_histogram(intra_distances: np.ndarray,
     plt.savefig(os.path.join(save_dir, f'{filename}.png'), dpi=300, bbox_inches='tight', pad_inches=0)
     plt.close()
 
-def roc(results: dict,
-        save_dir: str,
-        filename: str = 'roc',
-        title: str = None,
-        legend_title: str = None,
-        plot_eer: bool = True,
-        include_auc: bool = True,
-        x_lim: tuple = (0, 1),
-        y_lim: tuple = (0, 1)):
+def roc(
+    results: dict,
+    save_dir: str,
+    filename: str = 'roc',
+    title: str = None,
+    legend_title: str = None,
+    plot_eer: bool = True,
+    include_auc: bool = True,
+    x_lim: tuple = (0, 1),
+    y_lim: tuple = (0, 1)
+):
     plt.figure()
     
     colors = plt.cm.get_cmap('tab20', len(results)).colors

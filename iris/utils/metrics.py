@@ -2,10 +2,12 @@ import numpy as np
 from sklearn.metrics import pairwise_distances, roc_curve
 
 
-def compute_inter_and_intra_class_distances(embeddings_x: np.ndarray,
-                                            labels_x: np.ndarray,
-                                            embeddings_y: np.ndarray = None,
-                                            labels_y: np.ndarray = None) -> tuple[np.ndarray, np.ndarray]:
+def compute_inter_and_intra_class_distances(
+    embeddings_x: np.ndarray,
+    labels_x: np.ndarray,
+    embeddings_y: np.ndarray = None,
+    labels_y: np.ndarray = None
+) -> tuple[np.ndarray, np.ndarray]:
     assert len(embeddings_x) == len(labels_x)
     if embeddings_y is not None:
         assert labels_y is not None
