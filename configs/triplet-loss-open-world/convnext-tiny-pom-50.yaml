@@ -10,4 +10,5 @@ data: {
   "train_dir": "data/oculariris/open-world/left-eye/train",
   "test_dir": "data/oculariris/open-world/left-eye/test",
 }
+angle_correction: false
 max_anchor_negative_angle_diff: 50

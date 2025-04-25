@@ -59,7 +59,8 @@ class IrisTripletDataset(IrisDataset):
     def __getitem__(self, idx) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         if self.is_deterministic:
             anchor_idx, positive_idx, negative_idx = self.triplets[idx]
-            anchor_path = os.path.join(self.data_dir, self.image_filenames[anchor_idx])
+            anchor_filename = self.image_filenames[anchor_idx]
+            anchor_path = os.path.join(self.data_dir, anchor_filename)
             positive_path = os.path.join(self.data_dir, self.image_filenames[positive_idx])
             negative_path = os.path.join(self.data_dir, self.image_filenames[negative_idx])
         else:
