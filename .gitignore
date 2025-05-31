@@ -1,17 +1,20 @@
-# Generated files
-# ---------------
-out/*
+# Generated files.
+out/
 
-# Python Files
-# ------------
+# Python Files.
 *.pyc
 *.pyo
 *.pyd
-__pycache__
+**/__pycache__/
 
-# IDE Files
-# ---------
+# Virtual Environment.
+venv/
+
+# IDE Files.
 .code-workspace
 .idea
 .vscode
 .vs
+
+# Database Files.
+data/

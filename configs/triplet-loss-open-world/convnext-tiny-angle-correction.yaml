@@ -1,0 +1,14 @@
+experiment_name: "pom-0"
+model_name: "convnext_tiny"
+num_epochs: 100
+early_stopping_tolerance: 20
+learning_rate: 1.0e-4
+weight_decay: 0.0
+margin: 0.75
+batch_size: 64
+data: {
+  "train_dir": "data/oculariris/open-world/left-eye/train",
+  "test_dir": "data/oculariris/open-world/left-eye/test",
+}
+angle_correction: true
+max_anchor_negative_angle_diff: 0
